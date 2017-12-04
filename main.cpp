@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
     p.addOption({{"u", "use time"}, "use massage timer inteval. ms","u",""});
     p.addOption({{"m", "message name"}, "message name. string,default is " DEFAULT_MESSAGE,"m",DEFAULT_MESSAGE});
     p.addOption({{"I", "message id"}, "message ID. int,default is 91","I","91"});
-    p.addOption({{"s", "signal idx"}, "signal idx. int,default is 0","s","0"});
+    p.addOption({{"s", "signal idx"}, "signal idx. int,default is 0","s"});
+    p.addOption({{"n", "no run"}, "do not increment,default is 0","n","0"});
     p.addOption({{"i", "ip"}, "UDP host IP. string,default is 127.0.0.1","i","127.0.0.1"});
     p.addOption({{"p", "port"}, "UDP host port,int. default is 11000","p","11000"});
     p.addOption({{"V","verbose"}, "Verbose mode. Prints out more information."});
@@ -95,15 +96,16 @@ int main(int argc, char *argv[])
         QObject::connect(timer,&QTimer::timeout,[&](){
             if(not message || message->len>8) return ;
             static quint64 cnt = 0;
+            static QStringList lst = p.value("s").split(QRegExp("\\W+"),QString::SkipEmptyParts);
+
             std::bitset<64> payload;
-            DBCSignalHandler *sigHandler = message->sigHandler;
-            for(int i=0;i<sigHandler->getCount();++i){
-                if(i == p.value("s").toInt()){
-                     payload = std::bitset<64>(cnt++);
-                }
-//                DBC_SIGNAL* sig = sigHandler->findSignalByIdx(i);
-//                qInfo() <<sig->parentMessage->ID<<sig->parentMessage->len  << sig->name<<sig->startBit<<sig->signalSize;
+            if(p.value("n").toInt()<=0){
+                DBCSignalHandler *sigHandler = message->sigHandler;
+    //            for(int i=0;i<sigHandler->getCount();++i){
+                    payload = std::bitset<64>(++cnt);
+    //            }
             }
+            for(auto s:lst) payload.set(s.toInt());
 
             QUdpSocket sock;
             QNetworkDatagram gram;
