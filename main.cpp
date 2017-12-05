@@ -72,29 +72,9 @@ int main(int argc, char *argv[])
             qInfo()<< msg->ID;
         }
 
-        ///////////////////////////////////////////////////
-        /*
-        QString name;
-        int startBit;
-        int signalSize;
-        bool intelByteOrder; //true is obviously little endian. False is big endian
-        bool isMultiplexor;
-        bool isMultiplexed;
-        int multiplexValue;
-        DBC_SIG_VAL_TYPE valType;
-        double factor;
-        double bias;
-        double min;
-        double max;
-        DBC_NODE *receiver; //it is fast to have a pointer but dangerous... Make sure to walk the whole tree and delete everything so nobody has stale references.
-        DBC_MESSAGE *parentMessage;
-        QString unitName;
-        QString comment;
-
-    */
         QTimer *timer = new QTimer(&app);
         QObject::connect(timer,&QTimer::timeout,[&](){
-            if(not message || message->len>8) return ;
+            if(not message or message->len>8) return ;
             static quint64 cnt = 0;
             static QStringList lst = p.value("s").split(QRegExp("\\W+"),QString::SkipEmptyParts);
 
